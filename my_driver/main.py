@@ -44,7 +44,7 @@ class BotDriver:
     def wait(self, v: WebDriverWait[Driver]) -> None:
         self.__wait = v
 
-    def __init__[T](self, bot: Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         options = Options()
         user_data_dir = WORKDIR.joinpath("chrome-data", bot.id_execucao)
 
