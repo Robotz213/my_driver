@@ -12,22 +12,22 @@ from types import CellType
 from typing import (
     TYPE_CHECKING,
     Literal,
+    NotRequired,
     TypedDict,
     Unpack,
     cast,
-    override,
 )
 from zipfile import ZipFile
 
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver import Chrome as SeChromeDriver
-from selenium.webdriver.chrome.options import Options as SeChromeOptions
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import (
     WebDriverWait as SEWebDriverWait,
 )
 from seleniumwire.webdriver import Chrome as SWireChrome
 
-from .constants import ARGUMENTS, PREFERENCES, SETTINGS, Preferences
+from .constants import ARGUMENTS, PREFERENCES, SETTINGS
 from .web_element import WebElement
 
 if TYPE_CHECKING:
@@ -37,7 +37,6 @@ if TYPE_CHECKING:
     from seleniumwire.request import Request
 
     from ._typing import Any, Bot, Driver
-    from .constants import Preferences
 
 
 type Exc = Iterable[type[Exception]]
@@ -56,19 +55,9 @@ IGNORED_EXCEPTIONS: Exc = (NoSuchElementException,)
 type ClosureType = tuple[CellType, ...]
 
 
-class Options(SeChromeOptions):
-    @override
-    def add_experimental_option(
-        self,
-        name: str,
-        value: Preferences,
-    ) -> None:
-        return super().add_experimental_option(name, value)
-
-
 class ChromeDriverKwargs(TypedDict):
-    options: Options | None
-    service: Service | None
+    options: NotRequired[Options]
+    service: NotRequired[Service]
 
 
 class SeleniumWireOptions(TypedDict):
@@ -105,25 +94,26 @@ class WrapperDriverWait[**P, R]:
     def __init__(self, fn: Callable[P, R]) -> None:
         self._fn = fn
 
-    def __call__(self, *arg: P.args, **kwarg: P.kwargs) -> R:
-        args = arg
-        kwargs = kwarg.copy()
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
 
-        predicate: Callable[P, R] = cast("Callable[P, R]", arg[0])
+        predicate: Callable[P, R] = cast("Callable[P, R]", args[0])
+        message = "Elemento não encontrado!"
         if all((
             any((
                 "presence" in predicate.__qualname__,
                 "visibility" in predicate.__qualname__,
             )),
-            not kwarg.get("message"),
+            not kwargs.get("message"),
         )):
             closure = cast("ClosureType", predicate.__closure__)
             element = closure[0].cell_contents[1]
-            kwarg.update({
-                "message": f'Elemento "{element}" não encontrado!',
-            })
+            message = f'Elemento "{element}" não encontrado!'
 
-        return self._fn(*args, **kwargs)
+        try:
+            return self._fn(*args, **kwargs)
+
+        except TimeoutException as e:
+            raise TimeoutException(msg=message) from e
 
 
 class Chrome(SeChromeDriver):
@@ -159,9 +149,11 @@ class SeWireChrome(SWireChrome):
     ) -> None:
         self._event_driver = Event()
         super().__init__(
-            seleniumwire_options=seleniumwire_options,  # pyright: ignore[reportCallIssue]
-            **kwargs,
-        )  # pyright: ignore[reportCallIssue]
+            seleniumwire_options=cast(
+                "dict[str, Any]",
+                seleniumwire_options,
+            ),
+        )
 
     def quit(self) -> None:
         self._event_driver.set()
@@ -212,7 +204,7 @@ class BotDriver:
             options.add_argument("--no-sandbox")
 
         download_dir = str(bot.output_dir_path)
-        preferences = PREFERENCES
+        preferences = cast("dict", PREFERENCES)
 
         preferences.update({
             "download.default_directory": download_dir,

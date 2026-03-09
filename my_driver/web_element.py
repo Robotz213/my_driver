@@ -62,7 +62,11 @@ class WebElement(SEWebElement):
 
         super().__init__(parent, id_)
 
-    def execute_script[T, T_arg](self, script: str, *args: T_arg) -> T:
+    def execute_script(
+        self,
+        script: str,
+        *args: object,
+    ) -> object:
 
         return self.parent.execute_script(script, self, *args)
 
@@ -122,7 +126,7 @@ class WebElement(SEWebElement):
             super().click()
 
         except ElementClickInterceptedException as e:
-            element_xpath: str = self.execute_script(
+            element_xpath = self.execute_script(
                 COMMAND_EXTRACT_XPATH,
                 self,
             )
