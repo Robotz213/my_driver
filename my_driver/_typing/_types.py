@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from selenium.webdriver import Chrome as SeChrome
-from seleniumwire.webdriver import Chrome as WiredChrome
+from types import CellType
 
 type Any = object
+type ClosureType = tuple[CellType, ...]
 
 
-class Driver(WiredChrome, SeChrome): ...
-
-
-__all__ = ["Any", "Driver"]
+__all__ = ["Any", "ClosureType"]

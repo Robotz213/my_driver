@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
+from selenium.common.exceptions import NoSuchElementException
+
 if TYPE_CHECKING:
-    from ._typing import Preferences, Settings
+    from ._typing import Exc, Preferences, Settings
+
+
+WORKDIR = Path.cwd()
+POLL_FREQUENCY: float = 0.5
+IGNORED_EXCEPTIONS: Exc = (NoSuchElementException,)
 
 SETTINGS: Settings = {
     "recentDestinations": [

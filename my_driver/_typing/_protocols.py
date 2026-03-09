@@ -17,3 +17,6 @@ class Bot(Protocol):
     def id_execucao(self) -> str: ...
     @property
     def config(self) -> Config: ...
+
+
+__all__ = ["Bot", "Config"]

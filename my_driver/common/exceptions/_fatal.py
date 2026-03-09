@@ -13,8 +13,7 @@ class FatalError(Exception):
 
     def __init__(
         self,
-        exc: Exception,
         *args: Any,
-        msg: str | None = None,
+        message: str | None = None,
     ) -> None:
-        Exception.__init__(self, msg)
+        Exception.__init__(self, message)
