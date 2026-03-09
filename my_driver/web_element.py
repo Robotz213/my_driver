@@ -29,7 +29,7 @@ from .constants import (
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from ._typing import Any, Driver
+    from ._typing import Driver
 
 
 class RectWebElement(TypedDict):
@@ -39,7 +39,7 @@ class RectWebElement(TypedDict):
     y: float
 
 
-class WebElement(SEWebElement):
+class __PropertiesWE(SEWebElement):
     @property
     def parent(self) -> Driver:
         return self._parent
@@ -56,6 +56,17 @@ class WebElement(SEWebElement):
     def actions(self, val: ActionChains) -> None:
         self._actions = val
 
+    @property
+    def current_driver(self) -> Driver:
+
+        return self._current_driver
+
+    @current_driver.setter
+    def current_driver(self, val: Driver) -> None:
+        self._current_driver = val
+
+
+class WebElement(__PropertiesWE):
     def __init__(self, parent: Driver, id_: str) -> None:
         self.actions = ActionChains(parent)
         self.current_driver = parent
@@ -69,29 +80,6 @@ class WebElement(SEWebElement):
     ) -> object:
 
         return self.parent.execute_script(script, self, *args)
-
-    def __call__(self, *args: Any, **kwargs: Any) -> None:
-
-        return super().click()
-
-    @property
-    def rect(self) -> dict[str, str]:
-
-        return super().rect
-
-    @property
-    def location(self) -> dict[str, str]:
-
-        return super().location
-
-    @property
-    def current_driver(self) -> Driver:
-
-        return self._current_driver
-
-    @current_driver.setter
-    def current_driver(self, val: Driver) -> None:
-        self._current_driver = val
 
     def double_click(self) -> None:
         """Execute um duplo clique no elemento web."""
