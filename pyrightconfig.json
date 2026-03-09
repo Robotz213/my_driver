@@ -1,0 +1,10 @@
+{
+  "typeCheckingMode": "standard",
+  "reportMissingModuleSource": "none",
+  "reportCallIssue": "none",
+  "reportUnknownMemberType": "none",
+  "reportArgumentType": "none",
+  "reportIncompatibleMethodOverride": "none",
+  "reportInvalidTypeVarUse": "none",
+  "reportInvalidTypeForm": "none"
+}
