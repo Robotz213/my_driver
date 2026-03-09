@@ -75,9 +75,9 @@ class BotDriver:
         options.add_experimental_option(name="prefs", value=preferences)
         ext_pathtemp = Path(mkdtemp())
 
-        for root, _, files in WORKDIR.joinpath(
-            "chrome-extensions",
-        ).walk():
+        extensions = WORKDIR.joinpath("chrome-extensions")
+
+        for root, _, files in extensions.walk():
             for file in filter(lambda x: x.endswith(".zip"), files):
                 filepath = root.joinpath(file)
                 extracted_filepath = ext_pathtemp.joinpath(
