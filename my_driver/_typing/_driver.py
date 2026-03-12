@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
-from selenium.webdriver import Chrome as SeChrome
+from selenium.webdriver.chrome.webdriver import WebDriver as SeChrome
 from seleniumwire.webdriver import Chrome as WiredChrome
 
 if TYPE_CHECKING:
